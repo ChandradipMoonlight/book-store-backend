@@ -4,7 +4,7 @@ import com.bridgelabz.bookstore.builder.MessageProperties;
 import com.bridgelabz.bookstore.builder.UserBuilder;
 import com.bridgelabz.bookstore.dto.UserDTO;
 import com.bridgelabz.bookstore.exception.BookStoreException;
-import com.bridgelabz.bookstore.model.UserRegistration;
+import com.bridgelabz.bookstore.model.UserModel;
 import com.bridgelabz.bookstore.repository.UserRepository;
 import com.bridgelabz.bookstore.utils.MailUtil;
 import com.bridgelabz.bookstore.utils.TokenUtil;
@@ -18,7 +18,7 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-public class ImlUserService implements IUserService {
+public class UserService implements IUserService {
 
     @Autowired
     private UserBuilder userBuilder;
@@ -35,7 +35,7 @@ public class ImlUserService implements IUserService {
     public String createUserRegistration(UserDTO userDTO) {
         log.info("Inside the createUserRegistration method of UserService Class.");
         String toEmail = userDTO.getEmail();
-        Optional<UserRegistration> byEmailId = userRepository.findByEmail(userDTO.getEmail());
+        Optional<UserModel> byEmailId = userRepository.findByEmail(userDTO.getEmail());
         if (byEmailId.isPresent()) {
             throw new BookStoreException("User Email Id is already present, Please try with different Email Id.",
                     BookStoreException.ExceptionType.USER_ALREADY_PRESENT);
@@ -43,8 +43,8 @@ public class ImlUserService implements IUserService {
 
         String password = bCryptPasswordEncoder.encode(userDTO.getPassword());
         userDTO.setPassword(password);
-        UserRegistration userRegistration = userBuilder.buildDo(userDTO);
-        userRepository.save(userRegistration);
+        UserModel userModel = userBuilder.buildDo(userDTO);
+        userRepository.save(userModel);
 
         String generatedToken = tokenUtil.generateVerificationToken(toEmail);
         String body = "http://localhost:8080/verifyemail?token=" + generatedToken;
@@ -62,14 +62,14 @@ public class ImlUserService implements IUserService {
     @Override
     public String verifyEmail(String token) {
         log.info("Inside verifyEmail service method.");
-        UserRegistration userRegistration = getUserByEmailToken(token);
-        userRegistration.setVerify(true);
-        userRepository.save(userRegistration);
+        UserModel userModel = getUserByEmailToken(token);
+        userModel.setVerify(true);
+        userRepository.save(userModel);
         log.info("verifyEmail service method successfully executed.");
         return MessageProperties.EMAIL_VERIFIED.getMessage();
     }
 
-    private UserRegistration getUserByEmailToken(String token) {
+    private UserModel getUserByEmailToken(String token) {
         String email = tokenUtil.parseToken(token);
         return userRepository.findByEmail(email).orElseThrow(
                 () -> new BookStoreException("Unauthorised User",

@@ -2,6 +2,8 @@ package com.bridgelabz.bookstore.model;
 
 
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -11,7 +13,7 @@ import java.time.LocalDate;
 
 @Data
 @Entity
-public class UserRegistration extends CommonEntity {
+public class UserModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -26,4 +28,10 @@ public class UserRegistration extends CommonEntity {
     private boolean verify;
     private int otp;
     private String userType;
+
+    @CreationTimestamp
+    private LocalDate registeredDate;
+
+    @UpdateTimestamp
+    private LocalDate updatedDate;
 }

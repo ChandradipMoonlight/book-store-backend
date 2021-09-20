@@ -2,7 +2,7 @@ package com.bridgelabz.bookstore.builder;
 
 
 import com.bridgelabz.bookstore.dto.UserDTO;
-import com.bridgelabz.bookstore.model.UserRegistration;
+import com.bridgelabz.bookstore.model.UserModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
@@ -11,10 +11,10 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class UserBuilder {
 
-    public UserRegistration buildDo(UserDTO userDTO) {
+    public UserModel buildDo(UserDTO userDTO) {
         log.info("Inside buildDo Method.");
-        UserRegistration userRegistration = new UserRegistration();
-        BeanUtils.copyProperties(userDTO, userRegistration);
-        return userRegistration;
+        UserModel userModel = new UserModel();
+        BeanUtils.copyProperties(userDTO, userModel);
+        return userModel;
     }
 }

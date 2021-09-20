@@ -1,11 +1,11 @@
 package com.bridgelabz.bookstore.repository;
 
-import com.bridgelabz.bookstore.model.UserRegistration;
+import com.bridgelabz.bookstore.model.UserModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<UserRegistration, Integer> {
+public interface UserRepository extends JpaRepository<UserModel, Integer> {
 
-    Optional<UserRegistration> findByEmail(String email);
+    Optional<UserModel> findByEmail(String email);
 }

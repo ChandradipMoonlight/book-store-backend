@@ -1,7 +1,6 @@
 package com.bridgelabz.bookstore.dto;
 
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,10 +25,9 @@ public class UserDTO {
     @NotEmpty(message = "KYC cannot be null")
     private String kyc;
 
-    @JsonFormat(pattern = "dd MMM yyyy")
     @NotNull(message = "Date of Birth should not be Empty")
     @Past(message = "Date of Birth should be past date")
-    private LocalDate dateOfBirth;
+    private LocalDate dataOfBirth;
 
     @NotEmpty(message = "Phone Number can not be null.")
     @Pattern(regexp = "^[6-9][0-9]{9}$")
@@ -43,6 +41,6 @@ public class UserDTO {
     @Pattern(regexp = "^(?=.*[0-9])(?=[^@#$%^&+=]*[@#$%^&+=][^@#$%^&+=]*$)(?=.*[a-z])(?=.*[A-Z]).{8,}$", message = "Password Invalid")
     private String password;
 
-    @Pattern(regexp = "User|Admin",message ="User Type should be Admin or User")
+    @Pattern(regexp = "User|Admin", message ="User Type should be Admin or User")
     private String userType;
 }
