@@ -13,7 +13,8 @@ public enum MessageProperties {
     DELETE_BOOK("Deleted the selected book from the list."),
     BOOK_NOT_FOUND("Book not found."),
     UPDATED_BOOK_PRICE("Updated price of the book."),
-    UPDATED_BOOK_QUANTITY("Updated quantity of the book.");
+    UPDATED_BOOK_QUANTITY("Updated quantity of the book."),
+    BOOK_ALREADY_EXIST("Book already exist.");
     private String message;
 
     MessageProperties(String message) {

@@ -15,4 +15,8 @@ public class BookStoreException extends RuntimeException {
         super(message);
         this.type = type;
     }
+
+    public BookStoreException(String message) {
+        super(message);
+    }
 }
