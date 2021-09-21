@@ -21,11 +21,11 @@ public class UserModel {
     private String firstName;
     private String lastName;
     private String kyc;
-    private LocalDate dataOfBirth;
+    private LocalDate dob;
     private String phoneNumber;
     private String email;
     private String password;
-    private boolean verify;
+    private boolean isVerified;
     private int otp;
     private String userType;
 

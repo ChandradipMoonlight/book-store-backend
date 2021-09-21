@@ -1,7 +1,10 @@
 package com.bridgelabz.bookstore.controller;
 
 
+import com.bridgelabz.bookstore.builder.MessageProperties;
+import com.bridgelabz.bookstore.dto.ResponseDTO;
 import com.bridgelabz.bookstore.dto.UserDTO;
+import com.bridgelabz.bookstore.dto.UserLoginDTO;
 import com.bridgelabz.bookstore.service.IUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +50,36 @@ public class UserController {
     public ResponseEntity<String> verifyEmail(@RequestParam(name = "token") String token) {
         log.info("Inside verifyEmail controller method.");
         return new ResponseEntity<>(userService.verifyEmail(token), HttpStatus.OK);
+    }
+
+    /**
+     * Purpose : Ability to login user after validating details.
+     *
+     * @param userLoginDTO Object accepts email and password from user.
+     *                     If matches user logs in successfully.
+     * @return response Object of ResponseDTO which returns the status of the POST Method.
+     */
+
+    @PostMapping("/login")
+    public ResponseEntity<ResponseDTO> userLogin(@Valid @RequestBody UserLoginDTO userLoginDTO) {
+        log.info("Inside userLogin controller method.");
+        ResponseDTO responseDTO = new ResponseDTO(MessageProperties.LOGIN_SUCCESSFUL.getMessage(), userService.loginUser(userLoginDTO));
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
+
+    /**
+     * Purpose : Ability to send email when user clicks on forget password.
+     *
+     * @param email Variable is matched with the existing emails in the repository.
+     *              If match found, a mail is triggered to the user to reset the
+     *              password.
+     * @return String Object to print the message.
+     */
+
+    @PostMapping("/forget-password")
+    public ResponseEntity<String> forgetPassword(@RequestParam(name = "email") String email) {
+        log.info("Inside forgetPassword controller method.");
+        return new ResponseEntity<>(userService.forgetPassword(email), HttpStatus.OK);
     }
 
 }

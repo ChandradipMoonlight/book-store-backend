@@ -3,6 +3,7 @@ package com.bridgelabz.bookstore.service;
 import com.bridgelabz.bookstore.builder.MessageProperties;
 import com.bridgelabz.bookstore.builder.UserBuilder;
 import com.bridgelabz.bookstore.dto.UserDTO;
+import com.bridgelabz.bookstore.dto.UserLoginDTO;
 import com.bridgelabz.bookstore.exception.BookStoreException;
 import com.bridgelabz.bookstore.model.UserModel;
 import com.bridgelabz.bookstore.repository.UserRepository;
@@ -31,23 +32,38 @@ public class UserService implements IUserService {
     @Autowired
     private TokenUtil tokenUtil;
 
+    /**
+     * Purpose : Ability to add user in the database.
+     *           This method is responsible to take use input and send email to that user
+     *           to for verification.
+     *           When use inter the details for registration and hit enter it will check first
+     *           whether the email is already present or not in database, if yes then it will throw exception that
+     *           "User Email id is already present, Please try with different Email id."  and if
+     *           not present then it will save the details in the database with encoded password.
+     *           And This method is also send the verification email to the user with token.
+     *
+     * @param userDTO UserRegistrationDTO object to store it in the repository.
+     * @return String Object to print the message.
+     */
+
     @Override
     public String createUserRegistration(UserDTO userDTO) {
         log.info("Inside the createUserRegistration method of UserService Class.");
         String toEmail = userDTO.getEmail();
         Optional<UserModel> byEmailId = userRepository.findByEmail(userDTO.getEmail());
+
         if (byEmailId.isPresent()) {
             throw new BookStoreException("User Email Id is already present, Please try with different Email Id.",
                     BookStoreException.ExceptionType.USER_ALREADY_PRESENT);
+        } else {
+            String password = bCryptPasswordEncoder.encode(userDTO.getPassword());
+            userDTO.setPassword(password);
+            UserModel userModel = userBuilder.buildDo(userDTO);
+            userRepository.save(userModel);
         }
 
-        String password = bCryptPasswordEncoder.encode(userDTO.getPassword());
-        userDTO.setPassword(password);
-        UserModel userModel = userBuilder.buildDo(userDTO);
-        userRepository.save(userModel);
-
         String generatedToken = tokenUtil.generateVerificationToken(toEmail);
-        String body = "http://localhost:8080/verifyemail?token=" + generatedToken;
+        String body = "http://localhost:8080/verifyEmail?token=" + generatedToken;
         System.out.println(body);
         try {
             String subject = "Complete the Registration ";
@@ -59,15 +75,92 @@ public class UserService implements IUserService {
         return MessageProperties.REGISTRATION_SUCCESSFUL.getMessage();
     }
 
+    /**
+     * Purpose : Ability to verify email after registration.
+     *           This method is used to verify the details which was given by the user.
+     *           when use click on the url which he got through email it will get verified.
+     *
+     * @param token  Object received from the get url.
+     *               The token is further matched with the user email,
+     *               and the verified column is set as true or false.
+     *
+     * @return      String Object to print the message.
+     */
+
     @Override
     public String verifyEmail(String token) {
         log.info("Inside verifyEmail service method.");
         UserModel userModel = getUserByEmailToken(token);
-        userModel.setVerify(true);
+        userModel.setVerified(true);
         userRepository.save(userModel);
         log.info("verifyEmail service method successfully executed.");
         return MessageProperties.EMAIL_VERIFIED.getMessage();
     }
+
+    /**
+     * Purpose : Ability to login user after validating details.
+     *
+     * @param userLoginDTO Object accepts email and password from user.
+     *                     If matches user logs in successfully.
+     *
+     * @return userLoginDTO object.
+     */
+
+    @Override
+    public String loginUser(UserLoginDTO userLoginDTO) {
+        log.info("Inside loginUser service method.");
+        UserModel userByEmail = userRepository.findByEmail(
+                userLoginDTO.getEmail()).orElseThrow(
+                () -> new BookStoreException("User with this email is not registered",
+                        BookStoreException.ExceptionType.EMAIL_NOT_FOUND));
+        if (userByEmail.isVerified()) {
+            boolean password = bCryptPasswordEncoder.matches(userLoginDTO.getPassword(),
+                    userByEmail.getPassword());
+            if (!password) {
+                throw new BookStoreException("Incorrect password",
+                        BookStoreException.ExceptionType.PASSWORD_INCORRECT);
+            }
+            log.info("loginUser service method successfully executed.");
+            return userLoginDTO.getEmail();
+        } else {
+            throw new BookStoreException("Not verified",
+                    BookStoreException.ExceptionType.EMAIL_NOT_VERIFIED);
+        }
+    }
+
+    /**
+     * Purpose : Ability to send email when user clicks on forget password.
+     *
+     * @param email Variable is matched with the existing emails in the repository.
+     *              If match found, a mail is triggered to the user to reset the
+     *              password.
+     * @return String Object to print the message.
+     */
+
+    @Override
+    public String forgetPassword(String email) {
+        log.info("Inside forgetPassword service method.");
+        UserModel userByEmail = userRepository.findByEmail(
+                email).orElseThrow(
+                () -> new BookStoreException("User with this email is not registered",
+                        BookStoreException.ExceptionType.EMAIL_NOT_FOUND));
+        if (userByEmail.isVerified()) {
+            try {
+                String subject = "Reset Password";
+                String displayMessage = "RESET PASSWORD";
+                mailUtil.sendEmail(email, tokenUtil.generateVerificationToken(email), subject,
+                        displayMessage);
+            } catch (MessagingException exception) {
+                exception.printStackTrace();
+            }
+        } else {
+            throw new BookStoreException("Not verified",
+                    BookStoreException.ExceptionType.EMAIL_NOT_VERIFIED);
+        }
+        log.info("forgetPassword service method successfully executed.");
+        return MessageProperties.FORGET_PASSWORD.getMessage();
+    }
+
 
     private UserModel getUserByEmailToken(String token) {
         String email = tokenUtil.parseToken(token);

@@ -1,6 +1,7 @@
 package com.bridgelabz.bookstore.service;
 
 import com.bridgelabz.bookstore.dto.UserDTO;
+import com.bridgelabz.bookstore.dto.UserLoginDTO;
 
 public interface IUserService {
 
@@ -8,4 +9,7 @@ public interface IUserService {
 
     String verifyEmail(String token);
 
+    String loginUser(UserLoginDTO userLoginDTO);
+
+    String forgetPassword(String email);
 }

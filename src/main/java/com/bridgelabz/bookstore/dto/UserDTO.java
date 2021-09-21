@@ -27,7 +27,7 @@ public class UserDTO {
 
     @NotNull(message = "Date of Birth should not be Empty")
     @Past(message = "Date of Birth should be past date")
-    private LocalDate dataOfBirth;
+    private LocalDate dob;
 
     @NotEmpty(message = "Phone Number can not be null.")
     @Pattern(regexp = "^[6-9][0-9]{9}$")
