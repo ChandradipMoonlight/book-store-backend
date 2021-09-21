@@ -12,4 +12,7 @@ public interface IUserService {
     String loginUser(UserLoginDTO userLoginDTO);
 
     String forgetPassword(String email);
+
+    String resetPassword(String token, String password);
+
 }

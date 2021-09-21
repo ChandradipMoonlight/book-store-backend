@@ -2,6 +2,7 @@ package com.bridgelabz.bookstore.controller;
 
 
 import com.bridgelabz.bookstore.builder.MessageProperties;
+import com.bridgelabz.bookstore.dto.PasswordDTO;
 import com.bridgelabz.bookstore.dto.ResponseDTO;
 import com.bridgelabz.bookstore.dto.UserDTO;
 import com.bridgelabz.bookstore.dto.UserLoginDTO;
@@ -82,4 +83,20 @@ public class UserController {
         return new ResponseEntity<>(userService.forgetPassword(email), HttpStatus.OK);
     }
 
+    /**
+     * Purpose : Ability to reset the password.
+     *
+     * @param token       Object received from the get url.
+     *                    The token is further matched with the user email.
+     * @param passwordDTO User sets the value in the passwordDTO object once the token is matched.
+     *                    It will update the password of user in repository.
+     * @return String Object to print the message.
+     */
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestHeader(name = "token") String token,
+                                                @Valid @RequestBody PasswordDTO passwordDTO) {
+        log.info("Inside resetPassword controller method.");
+        return new ResponseEntity<>(userService.resetPassword(token, passwordDTO.getPassword()), HttpStatus.OK);
+    }
 }

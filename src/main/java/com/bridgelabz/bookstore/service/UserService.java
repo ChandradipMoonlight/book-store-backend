@@ -161,6 +161,16 @@ public class UserService implements IUserService {
         return MessageProperties.FORGET_PASSWORD.getMessage();
     }
 
+    @Override
+    public String resetPassword(String token, String password) {
+        log.info("Inside resetPassword service method.");
+        UserModel user = getUserByEmailToken(token);
+        user.setPassword(bCryptPasswordEncoder.encode(password));
+        userRepository.save(user);
+        log.info("resetPassword service method successfully executed.");
+        return MessageProperties.RESET_PASSWORD.getMessage();
+    }
+
 
     private UserModel getUserByEmailToken(String token) {
         String email = tokenUtil.parseToken(token);
