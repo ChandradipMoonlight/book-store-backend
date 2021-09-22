@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
 import javax.validation.Valid;
 
 @Slf4j
@@ -99,4 +100,23 @@ public class UserController {
         log.info("Inside resetPassword controller method.");
         return new ResponseEntity<>(userService.resetPassword(token, passwordDTO.getPassword()), HttpStatus.OK);
     }
+
+    /**
+     * Purpose: Ability purchase the subscription.
+     *
+     * @param token Object received from the get url.
+     *              The token is further matched with the user id.
+     *
+     * @return String Object to print the message.
+     *
+     * @throws MessagingException ;
+     */
+
+    @PutMapping("/purchase-subscription/{token}")
+    public ResponseEntity<String> purchaseSubscription(@PathVariable String token) throws MessagingException {
+        log.info("Inside purchaseSubscription method of the UserController Class.");
+
+        return new ResponseEntity<>(userService.purchaseSubscription(token), HttpStatus.OK);
+    }
+
 }

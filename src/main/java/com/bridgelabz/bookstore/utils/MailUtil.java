@@ -49,8 +49,6 @@ public class MailUtil {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
         log.info("sendEmail method is executed successfully.");
     }
 

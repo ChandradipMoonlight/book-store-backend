@@ -181,7 +181,41 @@ public class UserService implements IUserService {
         return MessageProperties.RESET_PASSWORD.getMessage();
     }
 
+    /**
+     * Purpose: Ability to purchase the Subscription for one year.
+     *
+     * @param token Object received from the get url.
+     *              The token is further matched with the user id,
+     *              and the verified column is set as true or false.
+     *
+     * @return message that you have purchased subscription successfully.
+     * @throws MessagingException;
+     */
 
+    @Override
+    public String purchaseSubscription(String token) throws MessagingException {
+        log.info("Inside the purchaseSubscription method of the UserService Class.");
+        int userToken = tokenUtil.decodeToken(token);
+
+        Optional<UserModel> isUserPresent = userRepository.findById(userToken);
+        if (isUserPresent.isPresent()) {
+            LocalDate today = LocalDate.now();
+            isUserPresent.get().setPurchaseDate(LocalDate.now());
+            isUserPresent.get().setExpiryDate(today.plusYears(1));
+
+            String subject = "Here's your Purchase Subscription Link";
+            String body = "<p>Dear " + isUserPresent.get().getFirstName()+ "," + "</p>"
+                    + "<br>"
+                    + "<p>" + "You have Purchased Subscription for 1 Year." +
+                    " Your subscription is valid till"+ isUserPresent.get().getExpiryDate() + "</p>";
+            mailUtil.sendEmail(isUserPresent.get().getEmail(), subject, body);
+            userRepository.save(isUserPresent.get());
+            return MessageProperties.SUBSCRIPTION_PURCHASED_SUCCESSFULLY.getMessage();
+
+        } else {
+            throw new BookStoreException("User email id is not found, Please try with different email id.");
+        }
+    }
 
     private UserModel getUserByEmailToken(String token) {
         String email = tokenUtil.parseToken(token);

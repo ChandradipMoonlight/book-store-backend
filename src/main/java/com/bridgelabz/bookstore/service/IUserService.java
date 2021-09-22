@@ -17,4 +17,6 @@ public interface IUserService {
 
     String resetPassword(String token, String password);
 
+    String purchaseSubscription(String token) throws MessagingException;
+
 }
