@@ -13,7 +13,7 @@ import java.util.Properties;
 @Slf4j
 public class MailUtil {
 
-    public void sendEmail(String toEmail, String generatedToken, String subject, String displayMessage) throws MessagingException {
+    public void sendEmail(String toEmail,  String subject, String body) throws MessagingException {
         final String fromEmail = "chandradip96shivankar@gmail.com";
         final String password = "ddymkytcfrdhthxn";
         Properties properties = new Properties();
@@ -41,8 +41,7 @@ public class MailUtil {
             message.setFrom(new InternetAddress("no_reply@gmail.com", "NoReply"));
             message.setReplyTo(InternetAddress.parse("chandradip96shivankar@gmail.com", false));
             message.setSubject(subject, "UTF-8");
-            message.setText("Please click here : "
-                            + "<a href=\"http://localhost:8080/verifyEmail?token=" + generatedToken + "\">" +displayMessage +"</a>");
+            message.setText(body, "UTF-8", "html");
             message.setSentDate(new Date());
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail, false));
             Transport.send(message);

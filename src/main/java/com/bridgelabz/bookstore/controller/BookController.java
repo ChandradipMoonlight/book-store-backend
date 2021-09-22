@@ -68,15 +68,15 @@ public class BookController {
      * @param id On providing ID, the book-id is matched with the id value of the database.
      *                  If found, it updates the book price to Book repository, else returns error message.
      *
-     * @param bookDTO If ID is found, Object of BookDTO gets stored in the Database.
+     * @param price If ID is found, Object of BookDTO gets stored in the Database.
      * @return String Object to print the message.
      */
 
     @PutMapping("/update-price")
     public ResponseEntity<String> updateBookPrice(@RequestParam(name = "id") int id,
-                                                  @Valid @RequestBody BookDTO bookDTO) {
+                                                  @Valid @RequestParam double price) {
         log.info("Inside updateBookPrice controller method.");
-        return new ResponseEntity<>(bookService.updateBookPrice(id, bookDTO), HttpStatus.OK);
+        return new ResponseEntity<>(bookService.updateBookPrice(id, price), HttpStatus.OK);
     }
 
 
@@ -86,16 +86,16 @@ public class BookController {
      * @param id On providing ID, the book-id is matched with the id value of the database.
      *                  If found, it updates the book quantity to Book repository, else returns error message.
      *
-     * @param bookDTO If ID is found, Object of BookDTO gets stored in the Database.
+     * @param quantity If ID is found, Object of BookDTO gets stored in the Database.
      *
      * @return String Object to print the message.
      */
 
     @PutMapping("/update-quantity")
     public ResponseEntity<String> updateBookQuantity(@RequestParam(name = "id") int id,
-                                                     @Valid @RequestBody BookDTO bookDTO) {
+                                                     @RequestBody @Valid int quantity) {
         log.info("Inside updateBookPrice controller method.");
-        return new ResponseEntity<>(bookService.updateBookQuantity(id, bookDTO), HttpStatus.OK);
+        return new ResponseEntity<>(bookService.updateBookQuantity(id, quantity), HttpStatus.OK);
     }
 
 }

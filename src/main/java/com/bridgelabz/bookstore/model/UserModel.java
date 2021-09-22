@@ -27,7 +27,8 @@ public class UserModel {
     private String password;
     private boolean isVerified;
     private int otp;
-    private String userType;
+    private LocalDate purchaseDate;
+    private LocalDate expiryDate;
 
     @CreationTimestamp
     private LocalDate registeredDate;

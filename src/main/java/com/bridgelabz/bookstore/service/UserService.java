@@ -15,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Slf4j
@@ -63,12 +64,12 @@ public class UserService implements IUserService {
         }
 
         String generatedToken = tokenUtil.generateVerificationToken(toEmail);
-        String body = "http://localhost:8080/verifyEmail?token=" + generatedToken;
+        String body ="Dear" + userDTO.getFirstName() + ",\n Please click on the given link to complete the registration.\n " +
+                "http://localhost:8080/verifyEmail?token=" + generatedToken;
         System.out.println(body);
         try {
             String subject = "Complete the Registration ";
-            String displayMessage = "VERIFY";
-            mailUtil.sendEmail(toEmail, generatedToken, subject, displayMessage);
+            mailUtil.sendEmail(toEmail, subject, body);
         } catch (MessagingException exception) {
             exception.printStackTrace();
         }
@@ -88,7 +89,7 @@ public class UserService implements IUserService {
      */
 
     @Override
-    public String verifyEmail(String token) {
+    public String verifyEmailByToken(String token) {
         log.info("Inside verifyEmail service method.");
         UserModel userModel = getUserByEmailToken(token);
         userModel.setVerified(true);
@@ -147,9 +148,8 @@ public class UserService implements IUserService {
         if (userByEmail.isVerified()) {
             try {
                 String subject = "Reset Password";
-                String displayMessage = "RESET PASSWORD";
-                mailUtil.sendEmail(email, tokenUtil.generateVerificationToken(email), subject,
-                        displayMessage);
+                String body ="Click on the link to reset password\n" + "http://localhost:8080/verifyEmail?token=" + tokenUtil.generateVerificationToken(email);
+                mailUtil.sendEmail(email,  subject, body);
             } catch (MessagingException exception) {
                 exception.printStackTrace();
             }
@@ -161,6 +161,16 @@ public class UserService implements IUserService {
         return MessageProperties.FORGET_PASSWORD.getMessage();
     }
 
+    /**
+     * Purpose : Ability to reset the password.
+     *
+     * @param token Object received from the get url.
+     *               The token is further matched with the user email.
+     *
+     * @param password  User sets the password once the token is matched.
+     *                 It will update the password of user in repository.
+     * @return String object of the message.
+     */
     @Override
     public String resetPassword(String token, String password) {
         log.info("Inside resetPassword service method.");
@@ -170,6 +180,7 @@ public class UserService implements IUserService {
         log.info("resetPassword service method successfully executed.");
         return MessageProperties.RESET_PASSWORD.getMessage();
     }
+
 
 
     private UserModel getUserByEmailToken(String token) {

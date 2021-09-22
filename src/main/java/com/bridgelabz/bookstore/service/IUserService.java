@@ -3,11 +3,13 @@ package com.bridgelabz.bookstore.service;
 import com.bridgelabz.bookstore.dto.UserDTO;
 import com.bridgelabz.bookstore.dto.UserLoginDTO;
 
+import javax.mail.MessagingException;
+
 public interface IUserService {
 
     String createUserRegistration(UserDTO userDTO);
 
-    String verifyEmail(String token);
+    String verifyEmailByToken(String token);
 
     String loginUser(UserLoginDTO userLoginDTO);
 

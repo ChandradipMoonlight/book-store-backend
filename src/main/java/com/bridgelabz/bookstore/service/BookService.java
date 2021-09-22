@@ -100,17 +100,18 @@ public class BookService implements IBookService{
      * @param id On providing ID, the book-id is matched with the id value of the database.
      *                  If found, it updates the book price to Book repository, else returns error message.
      *
-     * @param bookDTO If ID is found, Object of BookDTO gets stored in the Database.
+     * @param price If ID is found, Object of BookDTO gets stored in the Database.
      * @return String Object to print the message.
      */
 
     @Override
-    public String updateBookPrice(int id, BookDTO bookDTO) {
-        BookModel bookModel = bookRepository.findById(id)
-                .orElseThrow(() -> new BookStoreException(MessageProperties.BOOK_NOT_FOUND.getMessage()));
+    public String updateBookPrice(int id, double price) {
+        Optional<BookModel> bookModel = bookRepository.findById(id);
 
-        bookModel.setBookPrice(bookDTO.getBookPrice());
-        bookRepository.save(bookModel);
+               bookModel .orElseThrow(() -> new BookStoreException(MessageProperties.BOOK_NOT_FOUND.getMessage()));
+
+        bookModel.get().setBookPrice(price);
+        bookRepository.save(bookModel.get());
         return MessageProperties.UPDATED_BOOK_PRICE.getMessage();
     }
 
@@ -120,17 +121,17 @@ public class BookService implements IBookService{
      * @param id On providing ID, the book-id is matched with the id value of the database.
      *                  If found, it updates the book quantity to Book repository, else returns error message.
      *
-     * @param bookDTO If ID is found, Object of BookDTO gets stored in the Database.
+     * @param quantity If ID is found, Object of BookDTO gets stored in the Database.
      * @return String Object to print the message.
      */
 
     @Override
-    public String updateBookQuantity(int id, BookDTO bookDTO) {
-        BookModel bookModel = bookRepository.findById(id)
-                .orElseThrow(() -> new BookStoreException(MessageProperties.BOOK_NOT_FOUND.getMessage()));
+    public String updateBookQuantity(int id, int quantity) {
+        Optional<BookModel> bookModel = bookRepository.findById(id);
+               bookModel .orElseThrow(() -> new BookStoreException(MessageProperties.BOOK_NOT_FOUND.getMessage()));
 
-        bookModel.setBookQuantity(bookDTO.getBookQuantity());
-        bookRepository.save(bookModel);
+        bookModel.get().setBookQuantity(quantity);
+        bookRepository.save(bookModel.get());
         return MessageProperties.UPDATED_BOOK_QUANTITY.getMessage();
     }
 }

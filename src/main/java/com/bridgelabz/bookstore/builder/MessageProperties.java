@@ -14,7 +14,8 @@ public enum MessageProperties {
     BOOK_NOT_FOUND("Book not found."),
     UPDATED_BOOK_PRICE("Updated price of the book."),
     UPDATED_BOOK_QUANTITY("Updated quantity of the book."),
-    BOOK_ALREADY_EXIST("Book already exist.");
+    BOOK_ALREADY_EXIST("Book already exist."),
+    SUBSCRIPTION_PURCHASED_SUCCESSFULLY("Subscription is Purchased Successfully.");
     private String message;
 
     MessageProperties(String message) {

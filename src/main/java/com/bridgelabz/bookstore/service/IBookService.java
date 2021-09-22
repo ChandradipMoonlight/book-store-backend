@@ -11,7 +11,7 @@ public interface IBookService {
 
     String deleteBook(int id);
 
-    String updateBookPrice(int id, BookDTO bookDTO);
+    String updateBookPrice(int id, double price);
 
-    String updateBookQuantity(int id, BookDTO bookDTO);
+    String updateBookQuantity(int id, int quantity);
 }
