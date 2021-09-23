@@ -51,9 +51,9 @@ public class UserService implements IUserService {
     public String createUserRegistration(UserDTO userDTO) {
         log.info("Inside the createUserRegistration method of UserService Class.");
         String toEmail = userDTO.getEmail();
-        Optional<UserModel> findUserById = userRepository.findById(userDTO.getUserId());
+        Optional<UserModel> findUserByEmail = userRepository.findByEmail(userDTO.getEmail());
 
-        if (findUserById.isPresent()) {
+        if (findUserByEmail.isPresent()) {
             throw new BookStoreException("User Email Id is already present, Please try with different Email Id.",
                     BookStoreException.ExceptionType.USER_ALREADY_PRESENT);
         } else {

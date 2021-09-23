@@ -79,18 +79,18 @@ public class BookService implements IBookService{
      *           if yes then it will delete that details of the book associated with that id
      *           and if not then it will throw BookStore Exception with Message "Book not Found.".
      *
-     * @param id On providing ID, it will delete the book details from the database if it matches
+     * @param bookId On providing ID, it will delete the book details from the database if it matches
      *           with the present database id.
      *
      * @return String Object to print the message.
      */
 
     @Override
-    public String deleteBook(int id) {
+    public String deleteBook(int bookId) {
         log.info("Inside deleteBook service method.");
-        Optional<BookModel> bookModel = bookRepository.findById(id);
+        Optional<BookModel> bookModel = bookRepository.findById(bookId);
         bookModel.orElseThrow(()-> new BookStoreException(MessageProperties.BOOK_NOT_FOUND.getMessage()));
-        bookRepository.deleteById(id);
+        bookRepository.deleteById(bookId);
         return MessageProperties.DELETE_BOOK.getMessage();
     }
 

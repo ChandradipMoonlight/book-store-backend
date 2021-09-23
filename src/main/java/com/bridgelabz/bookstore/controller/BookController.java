@@ -42,7 +42,7 @@ public class BookController {
      */
 
     @GetMapping
-    public ResponseEntity<ResponseDTO> getBook() {
+    public ResponseEntity<ResponseDTO> getBooks() {
         log.info("Inside getBook controller method.");
         List<BookDTO> bookList = bookService.getBooks();
         return new ResponseEntity<>(new ResponseDTO(MessageProperties.GET_BOOKS.getMessage(), bookList), HttpStatus.OK);

@@ -9,7 +9,7 @@ public interface IBookService {
 
     List<BookDTO> getBooks();
 
-    String deleteBook(int id);
+    String deleteBook(int bookId);
 
     String updateBookPrice(int id, double price);
 
