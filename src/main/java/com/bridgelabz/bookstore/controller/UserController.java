@@ -48,7 +48,7 @@ public class UserController {
      * @return String Object to print the message.
      */
 
-    @GetMapping("verifyEmail")
+    @GetMapping("verifyemail")
     public ResponseEntity<String> verifyEmailByToken(@RequestParam(name = "token") String token) {
         log.info("Inside verifyEmail controller method.");
         return new ResponseEntity<>(userService.verifyEmailByToken(token), HttpStatus.OK);

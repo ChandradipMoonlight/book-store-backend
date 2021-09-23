@@ -13,6 +13,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class UserDTO {
 
+    private int userId;
 
     @NotEmpty(message = "First Name cannot be null")
     @Pattern(regexp = "^[A-Z][a-zA-Z\\s]+$", message = "First Name Invalid")

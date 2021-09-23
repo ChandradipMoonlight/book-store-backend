@@ -51,9 +51,9 @@ public class UserService implements IUserService {
     public String createUserRegistration(UserDTO userDTO) {
         log.info("Inside the createUserRegistration method of UserService Class.");
         String toEmail = userDTO.getEmail();
-        Optional<UserModel> byEmailId = userRepository.findByEmail(userDTO.getEmail());
+        Optional<UserModel> findUserById = userRepository.findById(userDTO.getUserId());
 
-        if (byEmailId.isPresent()) {
+        if (findUserById.isPresent()) {
             throw new BookStoreException("User Email Id is already present, Please try with different Email Id.",
                     BookStoreException.ExceptionType.USER_ALREADY_PRESENT);
         } else {
@@ -61,19 +61,20 @@ public class UserService implements IUserService {
             userDTO.setPassword(password);
             UserModel userModel = userBuilder.buildDo(userDTO);
             userRepository.save(userModel);
-        }
+            String generatedToken = tokenUtil.generateToken(userModel.getUserId());
 
-        String generatedToken = tokenUtil.generateVerificationToken(toEmail);
-        String body ="Dear" + userDTO.getFirstName() + ",\n Please click on the given link to complete the registration.\n " +
-                "http://localhost:8080/verifyEmail?token=" + generatedToken;
-        System.out.println(body);
-        try {
-            String subject = "Complete the Registration ";
-            mailUtil.sendEmail(toEmail, subject, body);
-        } catch (MessagingException exception) {
-            exception.printStackTrace();
+
+            String body = "Dear" + userDTO.getFirstName() + ",\n Please click on the given link to complete the registration.\n " +
+                    "http://localhost:8080/verifyemail?token=" + generatedToken;
+            System.out.println(body);
+            try {
+                String subject = "Complete the Registration ";
+                mailUtil.sendEmail(toEmail, subject, body);
+            } catch (MessagingException exception) {
+                exception.printStackTrace();
+            }
+            return MessageProperties.REGISTRATION_SUCCESSFUL.getMessage();
         }
-        return MessageProperties.REGISTRATION_SUCCESSFUL.getMessage();
     }
 
     /**
@@ -91,11 +92,17 @@ public class UserService implements IUserService {
     @Override
     public String verifyEmailByToken(String token) {
         log.info("Inside verifyEmail service method.");
-        UserModel userModel = getUserByEmailToken(token);
-        userModel.setVerified(true);
-        userRepository.save(userModel);
+        int userId = tokenUtil.decodeToken(token);
+        System.out.println(userId);
+        Optional<UserModel> isUserPresent = userRepository.findById(userId);
         log.info("verifyEmail service method successfully executed.");
-        return MessageProperties.EMAIL_VERIFIED.getMessage();
+        if (isUserPresent.isPresent()) {
+            isUserPresent.get().setVerified(true);
+            userRepository.save(isUserPresent.get());
+            return MessageProperties.EMAIL_VERIFIED.getMessage();
+        } else {
+            return "No such user present";
+        }
     }
 
     /**
@@ -141,14 +148,16 @@ public class UserService implements IUserService {
     @Override
     public String forgetPassword(String email) {
         log.info("Inside forgetPassword service method.");
-        UserModel userByEmail = userRepository.findByEmail(
-                email).orElseThrow(
+        Optional<UserModel> isUserPresent = userRepository.findByEmail(email);
+
+        isUserPresent.orElseThrow(
                 () -> new BookStoreException("User with this email is not registered",
                         BookStoreException.ExceptionType.EMAIL_NOT_FOUND));
-        if (userByEmail.isVerified()) {
+        if (isUserPresent.get().isVerified()) {
             try {
                 String subject = "Reset Password";
-                String body ="Click on the link to reset password\n" + "http://localhost:8080/verifyEmail?token=" + tokenUtil.generateVerificationToken(email);
+                String body ="Click on the link to reset password\n" +
+                        "http://localhost:8080/verifyemail?token=" + tokenUtil.generateToken(isUserPresent.get().getUserId());
                 mailUtil.sendEmail(email,  subject, body);
             } catch (MessagingException exception) {
                 exception.printStackTrace();
@@ -174,9 +183,13 @@ public class UserService implements IUserService {
     @Override
     public String resetPassword(String token, String password) {
         log.info("Inside resetPassword service method.");
-        UserModel user = getUserByEmailToken(token);
-        user.setPassword(bCryptPasswordEncoder.encode(password));
-        userRepository.save(user);
+
+        int user = tokenUtil.decodeToken(token);
+
+        Optional<UserModel> isUserPresent = userRepository.findById(user);
+//        UserModel user = getUserByEmailToken(token);
+        isUserPresent.get().setPassword(bCryptPasswordEncoder.encode(password));
+        userRepository.save(isUserPresent.get());
         log.info("resetPassword service method successfully executed.");
         return MessageProperties.RESET_PASSWORD.getMessage();
     }
@@ -195,9 +208,9 @@ public class UserService implements IUserService {
     @Override
     public String purchaseSubscription(String token) throws MessagingException {
         log.info("Inside the purchaseSubscription method of the UserService Class.");
-        int userToken = tokenUtil.decodeToken(token);
+        int userId = tokenUtil.decodeToken(token);
 
-        Optional<UserModel> isUserPresent = userRepository.findById(userToken);
+        Optional<UserModel> isUserPresent = userRepository.findById(userId);
         if (isUserPresent.isPresent()) {
             LocalDate today = LocalDate.now();
             isUserPresent.get().setPurchaseDate(LocalDate.now());
@@ -207,7 +220,7 @@ public class UserService implements IUserService {
             String body = "<p>Dear " + isUserPresent.get().getFirstName()+ "," + "</p>"
                     + "<br>"
                     + "<p>" + "You have Purchased Subscription for 1 Year." +
-                    " Your subscription is valid till"+ isUserPresent.get().getExpiryDate() + "</p>";
+                    " Your subscription is valid till "+ isUserPresent.get().getExpiryDate() + "</p>";
             mailUtil.sendEmail(isUserPresent.get().getEmail(), subject, body);
             userRepository.save(isUserPresent.get());
             return MessageProperties.SUBSCRIPTION_PURCHASED_SUCCESSFULLY.getMessage();
@@ -217,10 +230,10 @@ public class UserService implements IUserService {
         }
     }
 
-    private UserModel getUserByEmailToken(String token) {
-        String email = tokenUtil.parseToken(token);
-        return userRepository.findByEmail(email).orElseThrow(
-                () -> new BookStoreException("Unauthorised User",
-                        BookStoreException.ExceptionType.UNAUTHORISED_USER));
-    }
+//    private UserModel getUserByEmailToken(String token) {
+//        String email = tokenUtil.parseToken(token);
+//        return userRepository.findByEmail(email).orElseThrow(
+//                () -> new BookStoreException("Unauthorised User",
+//                        BookStoreException.ExceptionType.UNAUTHORISED_USER));
+//    }
 }

@@ -13,7 +13,7 @@ import java.time.LocalDate;
 public class BookModel {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    private int bookId;
     private String bookName;
     private String bookAuthor;
     private String bookDescription;

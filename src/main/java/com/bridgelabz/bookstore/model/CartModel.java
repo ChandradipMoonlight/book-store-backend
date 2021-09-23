@@ -9,10 +9,15 @@ import javax.persistence.*;
 public class CartModel {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    private int cartId;
+
     private int quantity;
 
-    @OneToOne
-    @JoinColumn(name = "id")
-    public UserModel user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId")
+    private UserModel userModel;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "bookId")
+    private BookModel bookModel;
 }

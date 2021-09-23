@@ -11,7 +11,7 @@ import javax.validation.constraints.Pattern;
 @Data
 public class BookDTO {
 
-    private int id;
+    private int bookId;
 
     @NotEmpty(message = "Book Name cannot be null")
     @Pattern(regexp = "^[a-zA-Z0-9\\s]{2,25}", message = "Book Name Invalid")
