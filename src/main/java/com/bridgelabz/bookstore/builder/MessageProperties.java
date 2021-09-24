@@ -22,7 +22,8 @@ public enum MessageProperties {
     GET_CART_ITEMS("List of all cart items."),
     CART_NOT_FOUND("No Cart Found"),
     USER_NOT_FOUND("User Not Found."),
-    PLEASE_LOGIN("Please Login First.");
+    PLEASE_LOGIN("Please Login First."),
+    ORDER_CANCELLED("Order Cancelled Successfully!");
 
     private String message;
 

@@ -131,7 +131,7 @@ public class UserService implements IUserService {
             String token = tokenUtil.generateToken(userByEmail.getUserId());
             System.out.println("Token when login is : " + token);
             log.info("loginUser service method successfully executed.");
-            return "User Login Successfully. token : " + token;
+            return token;
 
         } else {
             throw new BookStoreException("Not verified",
