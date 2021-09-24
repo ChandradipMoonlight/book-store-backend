@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -38,6 +39,21 @@ public class OrderService implements IOrderService {
     @Autowired
     private BookRepository bookRepository;
 
+    /**
+     *Purpose:- Ability to place the order when user is verified.
+     *          this method is first check take the token and decode it and check whether the
+     *          user is verified or not if yes, it will check the book is selected or not if yes,
+     *          it will place the order successfully. else it will throw a costume exception.
+     *          that please log in first.
+     *
+     * @param token it is generated when user is logged in. it passed as input to check the
+     *              user is verified or not.
+     *
+     * @param orderDTO this object of the OrderDTO class which as all information related to
+     *                 place the order.
+     * @return response as object of the OrderDTO class and String message.
+     */
+
     @Override
     public ResponseDTO placeOrder(String token, OrderDTO orderDTO) {
         log.info("Inside the placeOrder method of the OrderService Class.");
@@ -57,6 +73,13 @@ public class OrderService implements IOrderService {
         } else
             throw new BookStoreException(MessageProperties.PLEASE_LOGIN.getMessage());
     }
+
+    /**
+     *
+     * @param token
+     * @param orderId
+     * @return
+     */
 
     @Override
     public String cancelOrder(String token, int orderId) {
@@ -81,12 +104,8 @@ public class OrderService implements IOrderService {
         int userId = tokenUtil.decodeToken(token);
         Optional<UserModel> isUserPresent = userRepository.findById(userId);
         if (isUserPresent.isPresent()) {
-//            Optional<OrderModel> order = orderRepository.findById(isUserPresent.get().getUserId());
-
-//            if (!order.get().isCancelled()) {
-                return  orderRepository.findAll();
-//            } else
-//                throw new BookStoreException("No order is placed.");
+                return  orderRepository.findAll().stream()
+                        .filter(cancel -> !cancel.isCancelled()).collect(Collectors.toList());
         } else
             throw new BookStoreException(MessageProperties.PLEASE_LOGIN.getMessage());
     }
@@ -98,9 +117,8 @@ public class OrderService implements IOrderService {
         Optional<UserModel> isUserPresent = userRepository.findById(getUserIdByToken);
         if (isUserPresent.isPresent()) {
          if (isUserPresent.get().getUserId() == userId) {
-             return orderRepository.findAllByUserModel(isUserPresent.get());
-//             return new ResponseDTO("All orders for user is retrieved successfully.",
-//                     orderRepository.findAllByUserModel(isUserPresent.get()));
+             return orderRepository.findAllByUserModel(isUserPresent.get()).stream()
+                     .filter(cancel -> !cancel.isCancelled()).collect(Collectors.toList());
          } else
              throw new BookStoreException("No order is placed");
         } else
