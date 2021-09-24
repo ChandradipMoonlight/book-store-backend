@@ -75,10 +75,14 @@ public class OrderService implements IOrderService {
     }
 
     /**
+     *Purpose:- Ability to cancel the order.
+     *          this method will cancel the order for the particular id when token get verified.
      *
-     * @param token
-     * @param orderId
-     * @return
+     * @param token is generated when user is logged in. and passed as input to verify the user.
+     *
+     * @param orderId is used to cancel the order for particular id only.
+     *
+     * @return object of the String message.
      */
 
     @Override
@@ -98,6 +102,18 @@ public class OrderService implements IOrderService {
             throw new BookStoreException(MessageProperties.PLEASE_LOGIN.getMessage());
     }
 
+    /**
+     * Purpose:- Ability to get all orders which are not cancelled.
+     *           this method first check the user is verified or not with the help of token, if not it
+     *           will throw new Costume exception that "please log in first." and if the user is
+     *           verified user it will filter the all non cancelled orders with the help of the java 8
+     *           feature stream api and return it.
+     *
+     * @param token is passed to verify the user
+     *
+     * @return object of the string message.
+     */
+
     @Override
     public List<OrderModel> getAllOrder(String token) {
         log.info("Inside the getAllOrder method of the OrderService Class.");
@@ -109,6 +125,17 @@ public class OrderService implements IOrderService {
         } else
             throw new BookStoreException(MessageProperties.PLEASE_LOGIN.getMessage());
     }
+
+    /**
+     * Purpose:- Ability ot get all orders for particular user.
+     *
+     * @param token is generated at the time of the login. and it is passed as input to
+     *              verify the user.
+     *
+     * @param userId input given to fetch all orders for the user.
+     *
+     * @return Object of the String message.
+     */
 
     @Override
     public List<OrderModel> getAllOrderForUser(String token, int userId) {
