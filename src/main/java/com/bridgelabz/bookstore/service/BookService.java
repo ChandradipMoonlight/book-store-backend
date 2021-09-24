@@ -5,7 +5,10 @@ import com.bridgelabz.bookstore.builder.MessageProperties;
 import com.bridgelabz.bookstore.dto.BookDTO;
 import com.bridgelabz.bookstore.exception.BookStoreException;
 import com.bridgelabz.bookstore.model.BookModel;
+import com.bridgelabz.bookstore.model.UserModel;
 import com.bridgelabz.bookstore.repository.BookRepository;
+import com.bridgelabz.bookstore.repository.UserRepository;
+import com.bridgelabz.bookstore.utils.TokenUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +31,12 @@ public class BookService implements IBookService{
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private TokenUtil tokenUtil;
+
     /**
      *  Purpose : Ability to insert book details in Book repository.
      *            This method first check the whether the name of the book is already present
@@ -43,17 +52,23 @@ public class BookService implements IBookService{
      */
 
     @Override
-    public String addBook(BookDTO bookDTO) {
+    public String addBook(String token, BookDTO bookDTO) {
         log.info("Inside the addBook method of BookService Class.");
-        Optional<BookModel> bookName = bookRepository.findByBookName(bookDTO.getBookName());
+        int userId = tokenUtil.decodeToken(token);
+        Optional<UserModel> isUserPresent = userRepository.findById(userId);
 
-        if (bookName.isPresent()) {
-            throw new BookStoreException(MessageProperties.BOOK_ALREADY_EXIST.getMessage());
-        } else {
-            BookModel book = bookBuilder.buildDO(bookDTO);
-            bookRepository.save(book);
-            return MessageProperties.BOOK_ADDED_SUCCESSFULLY.getMessage();
-        }
+        if (isUserPresent.isPresent()) {
+            Optional<BookModel> bookName = bookRepository.findByBookName(bookDTO.getBookName());
+
+            if (bookName.isPresent()) {
+                throw new BookStoreException(MessageProperties.BOOK_ALREADY_EXIST.getMessage());
+            } else {
+                BookModel book = bookBuilder.buildDO(bookDTO);
+                bookRepository.save(book);
+                return MessageProperties.BOOK_ADDED_SUCCESSFULLY.getMessage();
+            }
+        } else
+            throw new BookStoreException(MessageProperties.UNAUTHORISED_USER.getMessage());
     }
 
     /**
@@ -65,11 +80,16 @@ public class BookService implements IBookService{
      */
 
     @Override
-    public List<BookDTO> getBooks() {
+    public List<BookDTO> getBooks(String token) {
         log.info("Inside getBooks service method.");
-        return bookRepository.findAll().stream()
-                .map(book -> modelMapper.map(book, BookDTO.class))
-                .collect(Collectors.toList());
+        int userId = tokenUtil.decodeToken(token);
+        Optional<UserModel> isUserPresent= userRepository.findById(userId);
+        if (isUserPresent.isPresent()) {
+            return bookRepository.findAll().stream()
+                    .map(book -> modelMapper.map(book, BookDTO.class))
+                    .collect(Collectors.toList());
+        } else
+            throw new BookStoreException(MessageProperties.PLEASE_LOGIN.getMessage());
     }
 
     /**
@@ -86,12 +106,17 @@ public class BookService implements IBookService{
      */
 
     @Override
-    public String deleteBook(int bookId) {
+    public String deleteBook(String token, int bookId) {
         log.info("Inside deleteBook service method.");
-        Optional<BookModel> bookModel = bookRepository.findById(bookId);
-        bookModel.orElseThrow(()-> new BookStoreException(MessageProperties.BOOK_NOT_FOUND.getMessage()));
-        bookRepository.deleteById(bookId);
-        return MessageProperties.DELETE_BOOK.getMessage();
+        int userId = tokenUtil.decodeToken(token);
+        Optional<UserModel> isUserPresent= userRepository.findById(userId);
+        if (isUserPresent.isPresent()) {
+            Optional<BookModel> bookModel = bookRepository.findById(bookId);
+            bookModel.orElseThrow(()-> new BookStoreException(MessageProperties.BOOK_NOT_FOUND.getMessage()));
+            bookRepository.deleteById(bookId);
+            return MessageProperties.DELETE_BOOK.getMessage();
+        } else
+            throw new BookStoreException(MessageProperties.PLEASE_LOGIN.getMessage());
     }
 
     /**
@@ -105,14 +130,18 @@ public class BookService implements IBookService{
      */
 
     @Override
-    public String updateBookPrice(int id, double price) {
-        Optional<BookModel> bookModel = bookRepository.findById(id);
-
-               bookModel .orElseThrow(() -> new BookStoreException(MessageProperties.BOOK_NOT_FOUND.getMessage()));
-
-        bookModel.get().setBookPrice(price);
-        bookRepository.save(bookModel.get());
-        return MessageProperties.UPDATED_BOOK_PRICE.getMessage();
+    public String updateBookPrice(String token, int id, double price) {
+        log.info("Inside UpdateBook service method.");
+        int userId = tokenUtil.decodeToken(token);
+        Optional<UserModel> isUserPresent= userRepository.findById(userId);
+        if (isUserPresent.isPresent()) {
+            Optional<BookModel> bookModel = bookRepository.findById(id);
+            bookModel .orElseThrow(() -> new BookStoreException(MessageProperties.BOOK_NOT_FOUND.getMessage()));
+            bookModel.get().setBookPrice(price);
+            bookRepository.save(bookModel.get());
+            return MessageProperties.UPDATED_BOOK_PRICE.getMessage();
+        } else
+            throw new BookStoreException(MessageProperties.PLEASE_LOGIN.getMessage());
     }
 
     /**
@@ -126,12 +155,17 @@ public class BookService implements IBookService{
      */
 
     @Override
-    public String updateBookQuantity(int id, int quantity) {
-        Optional<BookModel> bookModel = bookRepository.findById(id);
-               bookModel .orElseThrow(() -> new BookStoreException(MessageProperties.BOOK_NOT_FOUND.getMessage()));
-
-        bookModel.get().setBookQuantity(quantity);
-        bookRepository.save(bookModel.get());
-        return MessageProperties.UPDATED_BOOK_QUANTITY.getMessage();
+    public String updateBookQuantity(String token, int id, int quantity) {
+        log.info("Inside UpdateBook service method.");
+        int userId = tokenUtil.decodeToken(token);
+        Optional<UserModel> isUserPresent= userRepository.findById(userId);
+        if (isUserPresent.isPresent()) {
+            Optional<BookModel> bookModel = bookRepository.findById(id);
+            bookModel .orElseThrow(() -> new BookStoreException(MessageProperties.BOOK_NOT_FOUND.getMessage()));
+            bookModel.get().setBookQuantity(quantity);
+            bookRepository.save(bookModel.get());
+            return MessageProperties.UPDATED_BOOK_QUANTITY.getMessage();
+        } else
+            throw new BookStoreException(MessageProperties.PLEASE_LOGIN.getMessage());
     }
 }

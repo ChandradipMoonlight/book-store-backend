@@ -29,9 +29,9 @@ public class BookController {
      */
 
     @PostMapping("/add")
-    public ResponseEntity<String> addBook(@RequestBody @Valid BookDTO bookDTO) {
+    public ResponseEntity<String> addBook(@RequestParam String token, @RequestBody @Valid BookDTO bookDTO) {
         log.info("Inside addBook controller method.");
-        return new ResponseEntity<>(bookService.addBook(bookDTO), HttpStatus.OK);
+        return new ResponseEntity<>(bookService.addBook(token, bookDTO), HttpStatus.OK);
     }
 
 
@@ -41,10 +41,10 @@ public class BookController {
      * @return String Object to print the message.
      */
 
-    @GetMapping
-    public ResponseEntity<ResponseDTO> getBooks() {
+    @GetMapping("/get-all-books")
+    public ResponseEntity<ResponseDTO> getBooks(@RequestParam String token) {
         log.info("Inside getBook controller method.");
-        List<BookDTO> bookList = bookService.getBooks();
+        List<BookDTO> bookList = bookService.getBooks(token);
         return new ResponseEntity<>(new ResponseDTO(MessageProperties.GET_BOOKS.getMessage(), bookList), HttpStatus.OK);
     }
 
@@ -57,9 +57,10 @@ public class BookController {
      */
 
     @DeleteMapping("/delete")
-    public ResponseEntity<String> deleteBook(@RequestParam(name = "id") int id) {
+    public ResponseEntity<String> deleteBook(@RequestParam String token,
+                                             @RequestParam(name = "id") int id) {
         log.info("Inside deleteBook controller method.");
-        return new ResponseEntity<>(bookService.deleteBook(id), HttpStatus.OK);
+        return new ResponseEntity<>(bookService.deleteBook(token, id), HttpStatus.OK);
     }
 
     /**
@@ -73,10 +74,10 @@ public class BookController {
      */
 
     @PutMapping("/update-price")
-    public ResponseEntity<String> updateBookPrice(@RequestParam(name = "id") int id,
+    public ResponseEntity<String> updateBookPrice(@RequestParam String token, @RequestParam(name = "id") int id,
                                                   @Valid @RequestParam double price) {
         log.info("Inside updateBookPrice controller method.");
-        return new ResponseEntity<>(bookService.updateBookPrice(id, price), HttpStatus.OK);
+        return new ResponseEntity<>(bookService.updateBookPrice(token, id, price), HttpStatus.OK);
     }
 
 
@@ -92,10 +93,11 @@ public class BookController {
      */
 
     @PutMapping("/update-quantity")
-    public ResponseEntity<String> updateBookQuantity(@RequestParam(name = "id") int id,
+    public ResponseEntity<String> updateBookQuantity(@RequestParam String token,
+                                                     @RequestParam(name = "id") int id,
                                                      @RequestBody @Valid int quantity) {
         log.info("Inside updateBookPrice controller method.");
-        return new ResponseEntity<>(bookService.updateBookQuantity(id, quantity), HttpStatus.OK);
+        return new ResponseEntity<>(bookService.updateBookQuantity(token, id, quantity), HttpStatus.OK);
     }
 
 }

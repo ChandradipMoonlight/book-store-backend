@@ -128,8 +128,11 @@ public class UserService implements IUserService {
                 throw new BookStoreException("Incorrect password",
                         BookStoreException.ExceptionType.PASSWORD_INCORRECT);
             }
+            String token = tokenUtil.generateToken(userByEmail.getUserId());
+            System.out.println("Token when login is : " + token);
             log.info("loginUser service method successfully executed.");
-            return userLoginDTO.getEmail();
+            return "User Login Successfully. token : " + token;
+
         } else {
             throw new BookStoreException("Not verified",
                     BookStoreException.ExceptionType.EMAIL_NOT_VERIFIED);
@@ -229,11 +232,4 @@ public class UserService implements IUserService {
             throw new BookStoreException("User email id is not found, Please try with different email id.");
         }
     }
-
-//    private UserModel getUserByEmailToken(String token) {
-//        String email = tokenUtil.parseToken(token);
-//        return userRepository.findByEmail(email).orElseThrow(
-//                () -> new BookStoreException("Unauthorised User",
-//                        BookStoreException.ExceptionType.UNAUTHORISED_USER));
-//    }
 }

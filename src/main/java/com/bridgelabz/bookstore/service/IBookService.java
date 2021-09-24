@@ -5,13 +5,13 @@ import com.bridgelabz.bookstore.dto.BookDTO;
 import java.util.List;
 
 public interface IBookService {
-    String addBook(BookDTO bookDTO);
+    String addBook(String token, BookDTO bookDTO);
 
-    List<BookDTO> getBooks();
+    List<BookDTO> getBooks(String token);
 
-    String deleteBook(int bookId);
+    String deleteBook(String token, int bookId);
 
-    String updateBookPrice(int id, double price);
+    String updateBookPrice(String token, int id, double price);
 
-    String updateBookQuantity(int id, int quantity);
+    String updateBookQuantity(String token, int id, int quantity);
 }
