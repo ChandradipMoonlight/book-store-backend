@@ -1,11 +1,11 @@
 
 # **Book Store Web Application**
+
 Simple online Book Store Web Application
 
 ***
 
 ## Tech Stack
-
 **Server:**  Spring Boot
 
 ***
